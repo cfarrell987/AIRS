@@ -1,7 +1,6 @@
-
-
 import requests
 import os
+import errno
 import json
 import sys
 from pathlib import Path
@@ -33,16 +32,16 @@ def get_logged_user():
             pass
     return user
 
-def get_home_path():
-    home_dir = os.getcwd() + str(Path("/AIRS"))
-    return home_dir
+def get_res_path():
+    res_dir = os.getcwd() + str(Path("/resources"))
+    return res_dir
 
 
 # Define Settings needed for authenticating and sending a GET request. Will Change this later as querystring will be fairly specific to each GET request
-def rest_settings(home):
+def rest_settings(resources):
 
-    home_path = home
-    api_key = Path(home_path + "/api_key.txt")
+    res_path = resources
+    api_key = Path(res_path + "/api_key.txt")
 
     with open(api_key, "r") as file:
         api_key = file.read()
@@ -95,33 +94,42 @@ def get_hardware(url, querystring, headers):
 def parser(models, hardware):
     hardware = hardware
     models = models
-    json_models = "models.json"
-    json_hardware = "hardware.json"
     curr_path = os.path.dirname(os.path.realpath(__file__))
-    print("Writing to json")
-    if os.path.exists(os.path.join(curr_path, json_models)):
-        os.remove(os.path.join(curr_path, json_models))
+
+    try:
+        os.makedirs(curr_path + "/output")
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
+
+
+    json_models = str(Path("/output/models.json"))
+    json_hardware = str(Path("/output/hardware.json"))
+
+    if os.path.exists(Path(curr_path + json_models)):
+        os.remove(Path(curr_path + json_models))
         print("Deleted old json")
 
-    with open(json_models, "w") as file:
+    with open(Path(curr_path + json_models), "w") as file:
+        print("Writing Models to json")
         json.dump(models, file)
 
-    if os.path.exists(os.path.join(curr_path, json_hardware)):
-        os.remove(os.path.join(curr_path, json_hardware))
+    if os.path.exists(Path(curr_path + json_hardware)):
+        os.remove(Path(curr_path + json_hardware))
         print("Deleted old json")
 
-    with open(json_hardware, "w") as file:
+    with open(Path(curr_path + json_hardware), "w") as file:
+        print("Writing Hardware to json")
         json.dump(hardware, file)
 
 
-#    print(json.dumps(models, indent=3))
-#    print(json.dumps(hardware, indent=4))
+
 
 if __name__ == '__main__':
 
-    home_path = get_home_path()
+    res_path = get_res_path()
 
-    querystring, headers = rest_settings(home_path)
+    querystring, headers = rest_settings(res_path)
     print(headers)
     models = get_models("https://develop.snipeitapp.com/api/v1/hardware",
                         headers)

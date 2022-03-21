@@ -13,20 +13,13 @@ def read_json(filename: str) -> dict:
     return data
 
 
-def create_dataframe(data: list) -> pandas.DataFrame:
+def create_dataframe(data):
     # Declare an empty dataframe to append records
     dataframe = pandas.DataFrame()
 
-    # Looping through each record
-    for d in data:
-        # Normalize the column levels
-        record = pandas.json_normalize(d)
-
-        # Append it to the dataframe
-        dataframe = dataframe.append(record, ignore_index=True)
+    dataframe = pandas.json_normalize(data)
 
     return dataframe
-
 
 def convert(in_file, out_file):
     # Read the JSON file as python dictionary
@@ -39,12 +32,9 @@ def convert(in_file, out_file):
     # Renaming columns of the dataframe
     print("Normalized Columns:", dataframe.columns.to_list())
 
+    #Will look into renaming columns soon.
     dataframe.rename(columns={
-        "results.school": "school",
-        "results.high_school": "high_school",
-        "results.graduation": "graduation",
-        "education.graduation.major": "grad_major",
-        "education.graduation.minor": "grad_minor"
+        "model.name": "model_name"
     }, inplace=True)
 
     print("Renamed Columns:", dataframe.columns.to_list())

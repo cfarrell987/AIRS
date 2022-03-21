@@ -5,11 +5,13 @@ import json
 import sys
 from pathlib import Path
 from convert import converter
+
 if sys.platform != 'win32':
     import pwd
     import getpass
-def get_logged_user():
 
+
+def get_logged_user():
     try:
         return os.getlogin()
     except:
@@ -33,17 +35,20 @@ def get_logged_user():
             pass
     return user
 
+
 def get_res_path():
     res_dir = os.getcwd() + str(Path("/resources"))
     return res_dir
+
 
 def get_out_path():
     out_path = os.getcwd() + str(Path("/output"))
     return out_path
 
-# Define Settings needed for authenticating and sending a GET request. Will Change this later as querystring will be fairly specific to each GET request
-def rest_settings(resources):
 
+# Define Settings needed for authenticating and sending a GET request. Will Change this later as querystring will be
+# fairly specific to each GET request
+def rest_settings(resources):
     res_path = resources
     api_key = Path(res_path + "/api_key.txt")
 
@@ -66,14 +71,12 @@ def rest_settings(resources):
 
 # Sends GET request for models
 def get_models(url, headers):
-    url = url
     querystring = {
         "limit": "50",
         "offset": "0",
         "sort": "created_at",
         "order": "asc"
     }
-    headers = headers
 
     response = requests.request("GET",
                                 url,
@@ -84,17 +87,12 @@ def get_models(url, headers):
 
 # Sends GET request for hardware
 def get_hardware(url, querystring, headers):
-    url = url
-    querystring = querystring
-    headers = headers
-    response = requests.request("GET",url,headers=headers, params=querystring)
+    response = requests.request("GET", url, headers=headers, params=querystring)
 
     return response.json()
 
 
 def parser(models, hardware):
-    hardware = hardware
-    models = models
     curr_path = os.path.dirname(os.path.realpath(__file__))
 
     try:
@@ -102,7 +100,6 @@ def parser(models, hardware):
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise
-
 
     json_models = str(Path("/output/models.json"))
     json_hardware = str(Path("/output/hardware.json"))
@@ -124,13 +121,10 @@ def parser(models, hardware):
         json.dump(hardware, file)
 
 
-
-
 if __name__ == '__main__':
+    resource_path = get_res_path()
 
-    res_path = get_res_path()
-
-    querystring, headers = rest_settings(res_path)
+    querystring, headers = rest_settings(resource_path)
     print(headers)
     models = get_models("https://introhive.snipe-it.io/api/v1/models",
                         headers)

@@ -26,4 +26,4 @@ setup(name='resources',
       packages=find_packages(),
       include_package_data=True,
       install_requires=install_requires,
-      entry_points={'console_scripts': ['absd = main.main:main']})
+      entry_points={'console_scripts': ['absd = AIRS.AIRS:AIRS']})

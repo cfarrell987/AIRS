@@ -129,5 +129,5 @@ dmypy.json
 .pyre/
 
 # api key
-main//AIRS/*
-*.json
+/AIRS/resources/
+/AIRS/output/

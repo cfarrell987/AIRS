@@ -14,8 +14,8 @@ def logging_init():
             raise
 
     logging.basicConfig(format='%(asctime)s %(message)s',
-                            datefmt='/%m/%d/%Y %I:%M:%S %p',
-                            filename=os.path.join(
+                       datefmt='/%m/%d/%Y %I:%M:%S %p',
+                       filename=os.path.join(
                                 logging_path,
                                 time.strftime("%Y-%m-%d") + '.log'),
-                            level=logging.DEBUG)
+                       level=logging.DEBUG)

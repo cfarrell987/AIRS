@@ -4,6 +4,7 @@ import errno
 import json
 import sys
 from pathlib import Path
+from convert import converter
 if sys.platform != 'win32':
     import pwd
     import getpass
@@ -36,6 +37,9 @@ def get_res_path():
     res_dir = os.getcwd() + str(Path("/resources"))
     return res_dir
 
+def get_out_path():
+    out_path = os.getcwd() + str(Path("/output"))
+    return out_path
 
 # Define Settings needed for authenticating and sending a GET request. Will Change this later as querystring will be fairly specific to each GET request
 def rest_settings(resources):
@@ -47,7 +51,7 @@ def rest_settings(resources):
         api_key = file.read()
 
     querystring = {
-        "limit": "2",
+        "limit": "50",
         "offset": "0",
         "sort": "model",
         "order": "desc"
@@ -83,10 +87,7 @@ def get_hardware(url, querystring, headers):
     url = url
     querystring = querystring
     headers = headers
-    response = requests.request("GET",
-                                url,
-                                headers=headers,
-                                params=querystring)
+    response = requests.request("GET",url,headers=headers, params=querystring)
 
     return response.json()
 
@@ -131,8 +132,8 @@ if __name__ == '__main__':
 
     querystring, headers = rest_settings(res_path)
     print(headers)
-    models = get_models("https://develop.snipeitapp.com/api/v1/hardware",
+    models = get_models("https://introhive.snipe-it.io/api/v1/models",
                         headers)
-    hardware = get_hardware("https://develop.snipeitapp.com/api/v1/hardware",
-                            querystring, headers)
+    hardware = get_hardware("https://introhive.snipe-it.io/api/v1/hardware", querystring, headers)
     parser(models, hardware)
+    converter.main()

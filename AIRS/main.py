@@ -4,7 +4,6 @@ import errno
 import json
 import sys
 from pathlib import Path
-from convert import converter
 
 if sys.platform != 'win32':
     import pwd
@@ -37,12 +36,12 @@ def get_logged_user():
 
 
 def get_res_path():
-    res_dir = os.getcwd() + str(Path("/resources"))
+    res_dir = os.getcwd() + str(Path("/resources/"))
     return res_dir
 
 
 def get_out_path():
-    out_path = os.getcwd() + str(Path("/output"))
+    out_path = os.getcwd() + str(Path("/output/"))
     return out_path
 
 
@@ -92,42 +91,41 @@ def get_hardware(url, querystring, headers):
     return response.json()
 
 
-def parser(models, hardware):
+def parser(models, hardware, output_file):
     curr_path = os.path.dirname(os.path.realpath(__file__))
-
+    out_path = get_out_path()
+    parsed_path = Path(out_path + output_file)
     try:
-        os.makedirs(curr_path + "/output")
+        os.makedirs(out_path)
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise
 
-    json_models = str(Path("/output/models.json"))
-    json_hardware = str(Path("/output/hardware.json"))
+    print(parsed_path)
 
-    if os.path.exists(Path(curr_path + json_models)):
-        os.remove(Path(curr_path + json_models))
+    if os.path.exists(parsed_path):
+        os.remove(Path(out_path + output_file))
         print("Deleted old json")
 
-    with open(Path(curr_path + json_models), "w") as file:
-        print("Writing Models to json")
+    with open(parsed_path, "w") as file:
+        print("Writing to json")
         json.dump(models, file)
-
-    if os.path.exists(Path(curr_path + json_hardware)):
-        os.remove(Path(curr_path + json_hardware))
-        print("Deleted old json")
-
-    with open(Path(curr_path + json_hardware), "w") as file:
-        print("Writing Hardware to json")
-        json.dump(hardware, file)
-
 
 if __name__ == '__main__':
     resource_path = get_res_path()
+    #output_path = get_out_path()
+
+    json_models = "\models.json"
+    json_hardware = "\hardware.json"
 
     querystring, headers = rest_settings(resource_path)
+
     print(headers)
-    models = get_models("https://introhive.snipe-it.io/api/v1/models",
-                        headers)
+
+    models = get_models("https://introhive.snipe-it.io/api/v1/models", headers)
+
     hardware = get_hardware("https://introhive.snipe-it.io/api/v1/hardware", querystring, headers)
-    parser(models, hardware)
-    converter.main()
+
+    parser(models, hardware, json_hardware)
+
+

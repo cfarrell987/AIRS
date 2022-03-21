@@ -28,11 +28,9 @@ def create_dataframe(data: list) -> pandas.DataFrame:
     return dataframe
 
 
-def main():
+def convert(in_file, out_file):
     # Read the JSON file as python dictionary
-    json_name = air.get_out_path() + "\hardware.json"
-    csv_name = air.get_out_path() + "\details.csv"
-    data = read_json(filename=json_name)
+    data = read_json(filename=in_file)
 
     # Generate the dataframe for the array items in
     # details key
@@ -52,4 +50,5 @@ def main():
     print("Renamed Columns:", dataframe.columns.to_list())
 
     # Convert dataframe to CSV
-    dataframe.to_csv(csv_name, index=False)
+    dataframe.to_csv(out_file, index=False)
+

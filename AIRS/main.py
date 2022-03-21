@@ -4,7 +4,7 @@ import errno
 import json
 import sys
 from pathlib import Path
-
+from REST import get_request as getter
 if sys.platform != 'win32':
     import pwd
     import getpass
@@ -69,29 +69,10 @@ def rest_settings(resources):
 
 
 # Sends GET request for models
-def get_models(url, headers):
-    querystring = {
-        "limit": "50",
-        "offset": "0",
-        "sort": "created_at",
-        "order": "asc"
-    }
-
-    response = requests.request("GET",
-                                url,
-                                headers=headers,
-                                params=querystring)
-    return response.json()
 
 
-# Sends GET request for hardware
-def get_hardware(url, querystring, headers):
-    response = requests.request("GET", url, headers=headers, params=querystring)
-
-    return response.json()
-
-
-def parser(models, hardware, output_file):
+#TODO Look into handling multiple files with one call
+def parser(json_dump, output_file):
     curr_path = os.path.dirname(os.path.realpath(__file__))
     out_path = get_out_path()
     parsed_path = Path(out_path + output_file)
@@ -109,7 +90,7 @@ def parser(models, hardware, output_file):
 
     with open(parsed_path, "w") as file:
         print("Writing to json")
-        json.dump(models, file)
+        json.dump(json_dump, file)
 
 if __name__ == '__main__':
     resource_path = get_res_path()
@@ -121,11 +102,11 @@ if __name__ == '__main__':
     querystring, headers = rest_settings(resource_path)
 
     print(headers)
+    #Hardcode for testing, will have a config file for the snipe-IT url
+    url = "https://introhive.snipe-it.io/api/v1/"
+    hardware = getter.get_request(url+"hardware", querystring, headers)
+    models = getter.get_request(url + "models", querystring, headers)
 
-    models = get_models("https://introhive.snipe-it.io/api/v1/models", headers)
-
-    hardware = get_hardware("https://introhive.snipe-it.io/api/v1/hardware", querystring, headers)
-
-    parser(models, hardware, json_hardware)
-
+    parsed_hardware = parser(hardware, json_hardware)
+    parsed_models = parser(models, json_models)
 

@@ -5,6 +5,11 @@ import json
 import sys
 from pathlib import Path
 from REST import get_request as getter
+from convert import converter as conv
+
+# TODO create config file to read in
+
+
 if sys.platform != 'win32':
     import pwd
     import getpass
@@ -47,8 +52,8 @@ def get_out_path():
 
 # Define Settings needed for authenticating and sending a GET request. Will Change this later as querystring will be
 # fairly specific to each GET request
-def rest_settings(resources):
-    res_path = resources
+def rest_settings():
+    res_path = get_res_path()
     api_key = Path(res_path + "/api_key.txt")
 
     with open(api_key, "r") as file:
@@ -93,20 +98,21 @@ def parser(json_dump, output_file):
         json.dump(json_dump, file)
 
 if __name__ == '__main__':
-    resource_path = get_res_path()
-    #output_path = get_out_path()
-
     json_models = "\models.json"
     json_hardware = "\hardware.json"
+    out_path = get_out_path()
 
-    querystring, headers = rest_settings(resource_path)
+    querystring, headers = rest_settings()
 
-    print(headers)
     #Hardcode for testing, will have a config file for the snipe-IT url
     url = "https://introhive.snipe-it.io/api/v1/"
     hardware = getter.get_request(url+"hardware", querystring, headers)
     models = getter.get_request(url + "models", querystring, headers)
 
+    #Parse Test
     parsed_hardware = parser(hardware, json_hardware)
     parsed_models = parser(models, json_models)
+
+    #CSV Convert Test
+    conv.convert(out_path+json_hardware, out_path+"/hardware.csv")
 

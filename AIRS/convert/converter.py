@@ -14,8 +14,6 @@ def read_json(filename: str) -> dict:
 
 
 def create_dataframe(data):
-    # Declare an empty dataframe to append records
-    dataframe = pandas.DataFrame()
 
     dataframe = pandas.json_normalize(data)
 

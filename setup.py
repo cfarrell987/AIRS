@@ -13,7 +13,7 @@ if version < (3, 9):
 
 VERSION = '0.1.0'
 
-install_requires = ['requests', 'pandas']
+install_requires = ['requests', 'numpy', 'pandas']
 
 setup(name='resources',
       version=VERSION,

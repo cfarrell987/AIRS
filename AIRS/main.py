@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 from REST import get_request as getter
 from convert import converter as conv
+from convert import tableclean as clean
 
 # TODO create config file to read in
 
@@ -60,9 +61,9 @@ def rest_settings():
         api_key = file.read()
 
     querystring = {
-        "limit": "50",
+        "limit": "500",
         "offset": "0",
-        "sort": "model",
+        "sort": "asset_tag",
         "order": "desc"
     }
     headers = {
@@ -80,7 +81,7 @@ def rest_settings():
 def parser(json_dump, output_file):
     curr_path = os.path.dirname(os.path.realpath(__file__))
     out_path = get_out_path()
-    parsed_path = Path(out_path + output_file)
+    parsed_path = Path(out_path) / Path(output_file)
     try:
         os.makedirs(out_path)
     except OSError as e:
@@ -90,7 +91,7 @@ def parser(json_dump, output_file):
     print(parsed_path)
 
     if os.path.exists(parsed_path):
-        os.remove(Path(out_path + output_file))
+        os.remove(Path(out_path) / output_file)
         print("Deleted old json")
 
     with open(parsed_path, "w") as file:
@@ -98,8 +99,8 @@ def parser(json_dump, output_file):
         json.dump(json_dump, file)
 
 if __name__ == '__main__':
-    json_models = "\models.json"
-    json_hardware = "\hardware.json"
+    json_models = "models.json"
+    json_hardware = "hardware.json"
     out_path = get_out_path()
 
     querystring, headers = rest_settings()
@@ -114,5 +115,5 @@ if __name__ == '__main__':
     parsed_models = parser(models, json_models)
 
     #CSV Convert Test
-    conv.convert(out_path+json_hardware, out_path+"/hardware.csv")
-
+    conv.convert(str(Path(out_path) / json_hardware), str(Path(out_path) / "hardware.csv"))
+    clean.table_clean(str(Path(out_path) / "hardware.csv"))

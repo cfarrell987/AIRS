@@ -15,7 +15,7 @@ def table_clean(in_csv):
              'last_checkout.formatted', 'available_actions.checkout', 'available_actions.checkin',
              'available_actions.clone', 'available_actions.restore', 'available_actions.update',
              'available_actions.delete', 'rtd_location.id', 'rtd_location.name', 'last_checkout',
-             'location', 'assigned_to',	'supplier.id', 'supplier.name',
+             'location', 'assigned_to', 'supplier.id', 'supplier.name',
              'last_audit_date.datetime', 'last_audit_date.formatted', 'next_audit_date.date',
              'next_audit_date.formatted', 'warranty_expires', 'purchase_date'], inplace=True, axis=1)
 

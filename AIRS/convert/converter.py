@@ -26,7 +26,7 @@ def convert(in_file, out_file):
     data = read_json(filename=in_file)
     # Generate the dataframe for the array items in
     # details key
-    dataframe = create_dataframe(data=data['rows'])
+    dataframe = create_dataframe(data=data)
 
     # Renaming columns of the dataframe
     print("Normalized Columns:", dataframe.columns.to_list())

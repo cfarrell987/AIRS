@@ -61,10 +61,10 @@ def rest_settings():
         api_key = file.read()
 
     querystring = {
-        "limit": "500",
+        "limit": "100",
         "offset": "0",
         "sort": "asset_tag",
-        "order": "desc"
+        "order": "asc"
     }
     headers = {
         "Accept": "application/json",

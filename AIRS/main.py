@@ -76,6 +76,23 @@ def rest_settings():
 
 # Sends GET request for models
 
+# on first run, create a config file called config.json with the following: {'api_key': '<API_KEY>'}
+# and place it in the resources folder
+# if the config file does not exist, create it and place the API key in the file
+def config(API_KEY):
+    res_path = get_res_path()
+    config_path = Path(res_path + "/config.json")
+
+    if os.path.exists(config_path):
+        with open(config_path, "r") as file:
+            config_data = json.load(file)
+    else:
+        with open(config_path, "w") as file:
+            config_data = {'api_key': API_KEY}
+            json.dump(config_data, file)
+
+    return config_data
+
 
 #TODO Look into handling multiple files with one call
 def parser(json_dump, output_file):

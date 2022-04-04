@@ -10,6 +10,11 @@ from convert import tableclean as clean
 
 
 # TODO create config file to read in
+# TODO create config file to read in
+# TODO Create initial startup check and function.
+# TODO Test filtering SnipeIT Data to only macs or pc's
+# TODO Test comparing Jamf data to SnipeIT data with csv-diff and/or pandas
+# TODO Create front end with fancy buttons for management to use
 
 
 def get_res_path():

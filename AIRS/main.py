@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 
 from REST import get_request as getter
+from compares import compare as comp
 from convert import converter as conv
 from convert import tableclean as clean
 
@@ -14,6 +15,7 @@ from convert import tableclean as clean
 # TODO Test filtering SnipeIT Data to only macs or pc's
 # TODO Test comparing Jamf data to SnipeIT data with csv-diff and/or pandas
 # TODO Create front end with fancy buttons for management to use
+# TODO Use Pandas to generate Reports for Management to better understand our deployed environment
 
 
 def get_res_path():
@@ -116,3 +118,7 @@ if __name__ == '__main__':
     conv.convert(hardware, str(Path(out_path) / "hardware.csv"))
     # conv.convert(models, str(Path(out_path) / "models.csv"))
     clean.table_clean(str(Path(out_path) / "hardware.csv"))
+
+    # Compare Test
+    df = comp.compare(str(Path(out_path) / "hardware.csv"))
+    comp.write_csv(df, str(Path(out_path) / "hardware_diff.csv"))

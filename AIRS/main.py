@@ -8,37 +8,8 @@ from REST import get_request as getter
 from convert import converter as conv
 from convert import tableclean as clean
 
+
 # TODO create config file to read in
-
-
-if sys.platform != 'win32':
-    import pwd
-    import getpass
-
-
-def get_logged_user():
-    try:
-        return os.getlogin()
-    except:
-        pass
-
-    try:
-        user = os.environ['USER']
-    except KeyError:
-        return getpass.getuser()
-
-    if user == 'root':
-        try:
-            return os.environ['SUDO_USER']
-        except KeyError:
-            pass
-
-        try:
-            pkexec_uid = int(os.environ['PKEXEC_UID'])
-            return pwd.getpwuid(pkexec_uid).pw_name
-        except KeyError:
-            pass
-    return user
 
 
 def get_res_path():
@@ -61,10 +32,10 @@ def rest_settings():
         api_key = file.read()
 
     querystring = {
-        "limit": "500",
+        "limit": "100",
         "offset": "0",
         "sort": "asset_tag",
-        "order": "desc"
+        "order": "asc"
     }
     headers = {
         "Accept": "application/json",
@@ -76,8 +47,25 @@ def rest_settings():
 
 # Sends GET request for models
 
+# on first run, create a config file called config.json with the following: {'api_key': '<API_KEY>'}
+# and place it in the resources folder
+# if the config file does not exist, create it and place the API key in the file
+def config(API_KEY):
+    res_path = get_res_path()
+    config_path = Path(res_path + "/config.json")
 
-#TODO Look into handling multiple files with one call
+    if os.path.exists(config_path):
+        with open(config_path, "r") as file:
+            config_data = json.load(file)
+    else:
+        with open(config_path, "w") as file:
+            config_data = {'api_key': API_KEY}
+            json.dump(config_data, file)
+
+    return config_data
+
+
+# TODO Look into handling multiple files with one call
 def parser(json_dump, output_file):
     curr_path = os.path.dirname(os.path.realpath(__file__))
     out_path = get_out_path()
@@ -98,22 +86,24 @@ def parser(json_dump, output_file):
         print("Writing to json")
         json.dump(json_dump, file)
 
+
 if __name__ == '__main__':
     json_models = "models.json"
     json_hardware = "hardware.json"
     out_path = get_out_path()
 
-    querystring, headers = rest_settings()
+    query_string, headers = rest_settings()
 
-    #Hardcode for testing, will have a config file for the snipe-IT url
+    # Hardcode for testing, will have a config file for the snipe-IT url
     url = "https://introhive.snipe-it.io/api/v1/"
-    hardware = getter.get_request(url+"hardware", querystring, headers)
-    models = getter.get_request(url + "models", querystring, headers)
+    hardware = getter.get_request(url + "hardware", query_string, headers)
+    # models = getter.get_request(url + "models", query_string, headers)
 
-    #Parse Test
-    parsed_hardware = parser(hardware, json_hardware)
-    parsed_models = parser(models, json_models)
+    # Parse Test
+    # parsed_hardware = parser(hardware, json_hardware)
+    # parsed_models = parser(models, json_models)
 
-    #CSV Convert Test
-    conv.convert(str(Path(out_path) / json_hardware), str(Path(out_path) / "hardware.csv"))
+    # CSV Convert Test
+    conv.convert(hardware, str(Path(out_path) / "hardware.csv"))
+    # conv.convert(models, str(Path(out_path) / "models.csv"))
     clean.table_clean(str(Path(out_path) / "hardware.csv"))

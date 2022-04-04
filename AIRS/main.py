@@ -55,11 +55,6 @@ def config():
 # fairly specific to each GET request
 def rest_settings(apiKey):
     res_path = get_res_path()
-    api_key = Path(res_path + "/api_key.txt")
-
-    with open(api_key, "r") as file:
-        api_key = file.read()
-
     querystring = {
         "limit": "100",
         "offset": "0",
@@ -70,7 +65,6 @@ def rest_settings(apiKey):
         "Accept": "application/json",
         "Authorization": "Bearer " + apiKey.rstrip("'\n\"")
     }
-    print(headers)
     return querystring, headers
 
 
@@ -120,5 +114,5 @@ if __name__ == '__main__':
     clean.table_clean(str(Path(out_path) / "hardware.csv"))
 
     # Compare Test
-    df = comp.compare(str(Path(out_path) / "hardware.csv"))
-    comp.write_csv(df, str(Path(out_path) / "hardware_diff.csv"))
+    df = comp.compare(str(Path(out_path) / "hardware.csv"), str(Path(out_path) / "jamf_export.csv"))
+    comp.write_csv(df, str(Path(out_path) / "compare.csv"))

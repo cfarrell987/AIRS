@@ -9,11 +9,7 @@ from convert import converter as conv
 from convert import tableclean as clean
 
 
-# TODO create config file to read in
-# TODO create config file to read in
 # TODO Create initial startup check and function.
-# TODO Test filtering SnipeIT Data to only macs or pc's
-# TODO Test comparing Jamf data to SnipeIT data with csv-diff and/or pandas
 # TODO Create front end with fancy buttons for management to use
 # TODO Use Pandas to generate Reports for Management to better understand our deployed environment
 
@@ -90,6 +86,28 @@ def parser(json_dump, output_file):
         json.dump(json_dump, file)
 
 
+def snipe_to_jamf(snipe_file, jamf_file, output_file):
+    df1 = comp.read_csv(snipe_file)
+    df1 = comp.filter_csv(df1, "category_name", "Macbook")
+    df1 = comp.filter_csv(df1, "status_label_status_meta", "deployed")
+    df2 = comp.read_csv(jamf_file)
+    snipetojamf = comp.compare(df1, df2)
+
+    comp.write_csv(snipetojamf, output_file)
+    return snipetojamf
+
+
+def jamf_to_snipe(jamf_file, snipe_file, output_file):
+    df1 = comp.read_csv(jamf_file)
+    df2 = comp.read_csv(snipe_file)
+    df2 = comp.filter_csv(df2, "category_name", "Macbook")
+    df2 = comp.filter_csv(df2, "status_label_status_meta", "deployed")
+    jamftosnipe = comp.compare(df1, df2)
+
+    comp.write_csv(jamftosnipe, output_file)
+    return jamftosnipe
+
+
 if __name__ == '__main__':
     json_models = "models.json"
     json_hardware = "hardware.json"
@@ -114,5 +132,7 @@ if __name__ == '__main__':
     clean.table_clean(str(Path(out_path) / "hardware.csv"))
 
     # Compare Test
-    df = comp.compare(str(Path(out_path) / "hardware.csv"), str(Path(out_path) / "jamf_export.csv"))
-    comp.write_csv(df, str(Path(out_path) / "compare.csv"))
+    snipe_to_jamf(str(Path(out_path) / "hardware.csv"), str(Path(out_path) / "jamf_export.csv"),
+                  str(Path(out_path) / "snipe_to_jamf.csv"))
+    jamf_to_snipe(str(Path(out_path) / "jamf_export.csv"), str(Path(out_path) / "hardware.csv"),
+                  str(Path(out_path) / "jamf_to_snipe.csv"))

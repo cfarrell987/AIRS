@@ -18,15 +18,15 @@ def compare_df(df1, df2, column):
     return df1
 
 
-def compare(infile1, infile2):
-    read_csv(infile1)
-    df1 = read_csv(infile1)
-    df1 = filter_df(df1, 'category_name', 'Macbook')
-    df1 = filter_df(df1, 'status_label_status_meta', 'deployed')
-    df2 = read_csv(infile2)
+def filter_csv(df1, column, value):
+    df = filter_df(df1, column, value)
+    return df
 
+
+def compare(infile1, infile2):
+    df1 = infile1
+    df2 = infile2
     output = compare_df(df1, df2, 'serial')
-    print(output)
     return output
 
 

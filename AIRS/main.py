@@ -1,9 +1,8 @@
-import requests
-import os
 import errno
 import json
-import sys
+import os
 from pathlib import Path
+
 from REST import get_request as getter
 from convert import converter as conv
 from convert import tableclean as clean
@@ -27,9 +26,32 @@ def get_out_path():
     return out_path
 
 
+# on first run, create a config file called config.json with the following: {'api_key': '<API_KEY>'}
+# and place it in the resources folder
+# if the config file does not exist, create it and place the API key in the file
+def config():
+    res_path = get_res_path()
+    config_path = Path(res_path + "/config.json")
+
+    if os.path.exists(config_path):
+        with open(config_path, "r") as file:
+            config_data = json.load(file)
+            apikey = config_data['api_key']
+            domain = config_data['domain']
+    else:
+        with open(config_path, "w") as file:
+            apikey = input("Please enter your API Key: ")
+            domain = input("Please enter your org name: ")
+            config_data = {'api_key': apikey,
+                           'domain': domain}
+            json.dump(config_data, file)
+
+    return apikey, domain
+
+
 # Define Settings needed for authenticating and sending a GET request. Will Change this later as querystring will be
 # fairly specific to each GET request
-def rest_settings():
+def rest_settings(apiKey):
     res_path = get_res_path()
     api_key = Path(res_path + "/api_key.txt")
 
@@ -44,30 +66,10 @@ def rest_settings():
     }
     headers = {
         "Accept": "application/json",
-        "Authorization": api_key.rstrip("'\n\"")
+        "Authorization": "Bearer " + apiKey.rstrip("'\n\"")
     }
-
+    print(headers)
     return querystring, headers
-
-
-# Sends GET request for models
-
-# on first run, create a config file called config.json with the following: {'api_key': '<API_KEY>'}
-# and place it in the resources folder
-# if the config file does not exist, create it and place the API key in the file
-def config(API_KEY):
-    res_path = get_res_path()
-    config_path = Path(res_path + "/config.json")
-
-    if os.path.exists(config_path):
-        with open(config_path, "r") as file:
-            config_data = json.load(file)
-    else:
-        with open(config_path, "w") as file:
-            config_data = {'api_key': API_KEY}
-            json.dump(config_data, file)
-
-    return config_data
 
 
 # TODO Look into handling multiple files with one call
@@ -97,12 +99,14 @@ if __name__ == '__main__':
     json_hardware = "hardware.json"
     out_path = get_out_path()
 
-    query_string, headers = rest_settings()
+    apiKey, domain = config()
+
+    query_string, headers = rest_settings(apiKey)
 
     # Hardcode for testing, will have a config file for the snipe-IT url
-    url = "https://introhive.snipe-it.io/api/v1/"
+    url = "https://" + domain + ".snipe-it.io/api/v1/"
     hardware = getter.get_request(url + "hardware", query_string, headers)
-    # models = getter.get_request(url + "models", query_string, headers)
+    models = getter.get_request(url + "models", query_string, headers)
 
     # Parse Test
     # parsed_hardware = parser(hardware, json_hardware)

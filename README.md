@@ -9,9 +9,8 @@ Currently, Reports provided from SnipeIT need to be manually configured each tim
 ## Usage 
 1. Run `pip install -r requirements.txt` To install Depenedencies(See Below)
 2. Run `setup.py install`
-3. Create _resources folder_ and create _api_key.txt_
-4. Inside _api_key.txt_ add `Bearer $APIKEY`
-5. Run main.py
+5. Run `main.py`
+6. When prompted enter API Key and domain
 
 ## Dependencies
 1. [Numpy](https://pypi.org/project/numpy/)

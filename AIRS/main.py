@@ -5,6 +5,7 @@ from pathlib import Path
 
 from REST import get_request as getter
 from compares import compare as comp
+from compares import compliance
 from convert import converter as conv
 from convert import tableclean as clean
 
@@ -136,3 +137,4 @@ if __name__ == '__main__':
                   str(Path(out_path) / "snipe_to_jamf.csv"))
     jamf_to_snipe(str(Path(out_path) / "jamf_export.csv"), str(Path(out_path) / "hardware.csv"),
                   str(Path(out_path) / "jamf_to_snipe.csv"))
+    compliance.compliance_filter(str(Path(out_path) / "jamf_export.csv"), "firewall_enabled", False, str(Path(out_path) / "jamf_no_firewall.csv"))

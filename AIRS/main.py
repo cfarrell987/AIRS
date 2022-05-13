@@ -3,9 +3,10 @@ import json
 import os
 from pathlib import Path
 
+import pandas as pd
+
 from REST import get_request as getter
 from compares import compare as comp
-from compares import compliance
 from convert import converter as conv
 from convert import tableclean as clean
 
@@ -108,6 +109,16 @@ def jamf_to_snipe(jamf_file, snipe_file, output_file):
     comp.write_csv(jamftosnipe, output_file)
     return jamftosnipe
 
+def jamf_compliance(jamf_file, output_file):
+
+    df1 = comp.read_csv(jamf_file)
+    df2 = comp.filter_csv(df1, "firewall_enabled", False)
+    df3 = comp.filter_csv(df1, "sip_status", False)
+    df4 = comp.filter_csv(df1, "boot_partition_filevault2_status", "Not Encrypted")
+    df5 = comp.filter_csv(df1, "boot_partition_filevault2_status", "Pending")
+    df6 = comp.filter_csv(df1, "av_not_running", True)
+    df_complete = pd.concat([df2, df3, df4, df5, df6], join='inner')
+    comp.write_csv(df_complete, output_file)
 
 if __name__ == '__main__':
     json_models = "models.json"
@@ -137,4 +148,4 @@ if __name__ == '__main__':
                   str(Path(out_path) / "snipe_to_jamf.csv"))
     jamf_to_snipe(str(Path(out_path) / "jamf_export.csv"), str(Path(out_path) / "hardware.csv"),
                   str(Path(out_path) / "jamf_to_snipe.csv"))
-    compliance.compliance_filter(str(Path(out_path) / "jamf_export.csv"), "firewall_enabled", False, str(Path(out_path) / "jamf_no_firewall.csv"))
+    jamf_compliance(str(Path(out_path) / "jamf_export.csv"), str(Path(out_path) / "jamf_compliance.csv"))
